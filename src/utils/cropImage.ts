@@ -1,4 +1,7 @@
+// src/utils/cropImage.ts
+
 import { Area } from 'react-easy-crop/types';
+
 export default function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -9,7 +12,17 @@ export default function getCroppedImg(imageSrc: string, pixelCrop: Area): Promis
       canvas.height = pixelCrop.height;
       const ctx = canvas.getContext('2d');
       if (!ctx) return reject(new Error('Canvas error'));
-      ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height);
+      ctx.drawImage(
+        image,
+        pixelCrop.x,
+        pixelCrop.y,
+        pixelCrop.width,
+        pixelCrop.height,
+        0,
+        0,
+        pixelCrop.width,
+        pixelCrop.height
+      );
       canvas.toBlob(blob => {
         if (blob) resolve(blob);
         else reject(new Error('Blob creation failed'));
