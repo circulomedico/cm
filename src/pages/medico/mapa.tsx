@@ -18,6 +18,7 @@ export default function MapaProfissional() {
   const [conselhoNumero, setConselhoNumero] = useState("");
   const [areasDestaque, setAreasDestaque] = useState<string[]>([]);
   const [novaArea, setNovaArea] = useState("");
+  const [locaisAtendimento, setLocaisAtendimento] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
 
@@ -63,6 +64,7 @@ export default function MapaProfissional() {
             setConselhoNome(dados.conselhoNome || "");
             setConselhoNumero(dados.conselhoNumero || "");
             setAreasDestaque(dados.areasDestaque || []);
+            setLocaisAtendimento(dados.locaisAtendimento || []);
           }
         } catch (err) {
           console.log("Erro ao carregar dados do Firestore:", err);
@@ -90,6 +92,7 @@ export default function MapaProfissional() {
         conselhoNome,
         conselhoNumero,
         areasDestaque,
+        locaisAtendimento,
       });
       alert("Dados salvos com sucesso!");
     } catch (err) {
@@ -97,6 +100,27 @@ export default function MapaProfissional() {
       console.error(err);
     }
     setSalvando(false);
+  };
+
+  const adicionarLocal = () => {
+    if (locaisAtendimento.length < 5) {
+      setLocaisAtendimento([
+        ...locaisAtendimento,
+        { tipo: "", endereco: "", telefone: "", email: "" },
+      ]);
+    }
+  };
+
+  const removerLocal = (index: number) => {
+    const novosLocais = [...locaisAtendimento];
+    novosLocais.splice(index, 1);
+    setLocaisAtendimento(novosLocais);
+  };
+
+  const atualizarLocal = (index: number, campo: string, valor: string) => {
+    const novosLocais = [...locaisAtendimento];
+    novosLocais[index][campo] = valor;
+    setLocaisAtendimento(novosLocais);
   };
 
   return (
@@ -260,6 +284,93 @@ export default function MapaProfissional() {
               ))}
             </div>
           </div>
+
+          <h3 style={{ marginTop: "2rem" }}>Locais de Atendimento</h3>
+
+          {locaisAtendimento.map((local, index) => (
+            <div
+              key={index}
+              style={{
+                border: "1px solid #ccc",
+                padding: "1rem",
+                marginBottom: "1rem",
+                borderRadius: "8px",
+              }}
+            >
+              <h4>Local {index + 1}</h4>
+
+              <label>Tipo de local:</label><br />
+              <select
+                value={local.tipo}
+                onChange={(e) => atualizarLocal(index, "tipo", e.target.value)}
+              >
+                <option value="">Selecione</option>
+                <option value="consultório particular">Consultório particular</option>
+                <option value="clínica">Clínica</option>
+                <option value="hospital">Hospital</option>
+                <option value="atendimento domiciliar">Atendimento domiciliar</option>
+              </select>
+
+              <div style={{ marginTop: "0.5rem" }}>
+                <label>Endereço:</label><br />
+                <input
+                  value={local.endereco}
+                  onChange={(e) => atualizarLocal(index, "endereco", e.target.value)}
+                  style={{ width: "400px" }}
+                />
+              </div>
+
+              <div style={{ marginTop: "0.5rem" }}>
+                <label>Telefone:</label><br />
+                <input
+                  value={local.telefone}
+                  onChange={(e) => atualizarLocal(index, "telefone", e.target.value)}
+                  style={{ width: "300px" }}
+                />
+              </div>
+
+              <div style={{ marginTop: "0.5rem" }}>
+                <label>Email:</label><br />
+                <input
+                  value={local.email}
+                  onChange={(e) => atualizarLocal(index, "email", e.target.value)}
+                  style={{ width: "300px" }}
+                />
+              </div>
+
+              <button
+                onClick={() => removerLocal(index)}
+                style={{
+                  marginTop: "0.5rem",
+                  backgroundColor: "#f8d7da",
+                  color: "#721c24",
+                  border: "1px solid #f5c6cb",
+                  padding: "4px 8px",
+                  borderRadius: "4px",
+                  cursor: "pointer"
+                }}
+              >
+                Remover este local
+              </button>
+            </div>
+          ))}
+
+          {locaisAtendimento.length < 5 && (
+            <button
+              onClick={adicionarLocal}
+              style={{
+                backgroundColor: "#d4edda",
+                color: "#155724",
+                border: "1px solid #c3e6cb",
+                padding: "6px 12px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginBottom: "1rem"
+              }}
+            >
+              Adicionar novo local
+            </button>
+          )}
 
           <button onClick={salvarDados} disabled={salvando}>
             {salvando ? "Salvando..." : "Salvar Dados"}
