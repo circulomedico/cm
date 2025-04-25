@@ -13,6 +13,9 @@ export default function MapaProfissional() {
   const [pronome, setPronome] = useState("");
   const [sexo, setSexo] = useState("");
   const [curriculoResumido, setCurriculoResumido] = useState("");
+  const [curriculoCompleto, setCurriculoCompleto] = useState("");
+  const [conselhoNome, setConselhoNome] = useState("");
+  const [conselhoNumero, setConselhoNumero] = useState("");
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
 
@@ -43,6 +46,9 @@ export default function MapaProfissional() {
             setPronome(dados.pronome || "");
             setSexo(dados.sexo || "");
             setCurriculoResumido(dados.curriculoResumido || "");
+            setCurriculoCompleto(dados.curriculoCompleto || "");
+            setConselhoNome(dados.conselhoNome || "");
+            setConselhoNumero(dados.conselhoNumero || "");
           }
         } catch (err) {
           console.log("Erro ao carregar dados do Firestore:", err);
@@ -66,6 +72,9 @@ export default function MapaProfissional() {
         pronome,
         sexo,
         curriculoResumido,
+        curriculoCompleto,
+        conselhoNome,
+        conselhoNumero,
       });
       alert("Dados salvos com sucesso!");
     } catch (err) {
@@ -142,6 +151,36 @@ export default function MapaProfissional() {
               onChange={(e) => setCurriculoResumido(e.target.value)}
               style={{ width: "400px", height: "100px" }}
               maxLength={1000}
+            />
+          </div>
+
+          <div style={{ marginBottom: "1rem" }}>
+            <label>Currículo completo (até 1000 palavras):</label><br />
+            <textarea
+              value={curriculoCompleto}
+              onChange={(e) => setCurriculoCompleto(e.target.value)}
+              style={{ width: "600px", height: "200px" }}
+              maxLength={10000}
+            />
+          </div>
+
+          <div style={{ marginBottom: "1rem" }}>
+            <label>Nome do conselho profissional (até 20 letras):</label><br />
+            <input
+              value={conselhoNome}
+              onChange={(e) => setConselhoNome(e.target.value)}
+              maxLength={20}
+              style={{ width: "300px" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "1rem" }}>
+            <label>Número do conselho profissional (até 20 dígitos):</label><br />
+            <input
+              value={conselhoNumero}
+              onChange={(e) => setConselhoNumero(e.target.value)}
+              maxLength={20}
+              style={{ width: "300px" }}
             />
           </div>
 
