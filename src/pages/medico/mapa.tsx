@@ -22,24 +22,24 @@ export default function MapaProfissional() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
 
-  const sugestoesFixas = [
-    "epilepsia",
-    "Parkinson",
-    "tumor cerebral",
-    "AVC",
-    "microcirurgia",
-    "cirurgia funcional",
-    "hospital HC",
-    "Unifesp",
-    "neuroimagem",
-    "coluna cervical"
-  ];
+  const sugestoesFixas = ["epilepsia", "Parkinson", "tumor cerebral", "AVC", "microcirurgia", "cirurgia funcional", "hospital HC", "Unifesp", "neuroimagem", "coluna cervical"];
+  const planosSaude = ["Amil", "Unimed", "Bradesco", "SulAmérica", "NotreDame"];
+  const paises = ["Brasil"];
+  const estados = ["SP", "RJ", "MG"];
+  const cidades = {
+    SP: ["São Paulo", "Campinas"],
+    RJ: ["Rio de Janeiro", "Niterói"],
+    MG: ["Belo Horizonte", "Uberlândia"],
+  };
+  const bairros = {
+    "São Paulo": ["Moema", "Pinheiros", "Itaim Bibi"],
+    "Rio de Janeiro": ["Copacabana", "Barra", "Tijuca"],
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user?.email) {
         setUserEmail(user.email);
-
         try {
           const storage = getStorage();
           const fotoRef = ref(storage, `fotos-perfil/${user.email}.jpg`);
@@ -76,7 +76,6 @@ export default function MapaProfissional() {
 
     return () => unsubscribe();
   }, []);
-
   const salvarDados = async () => {
     if (!userEmail) return;
     setSalvando(true);
@@ -106,277 +105,282 @@ export default function MapaProfissional() {
     if (locaisAtendimento.length < 5) {
       setLocaisAtendimento([
         ...locaisAtendimento,
-        { tipo: "", endereco: "", telefone: "", email: "" },
+        {
+          tipo: "",
+          pais: "",
+          estado: "",
+          cidade: "",
+          cep: "",
+          endereco: "",
+          complemento: "",
+          telefone: "",
+          whatsapp: "",
+          email: "",
+          bairros: [],
+          atendimento: [],
+          planos: [],
+        },
       ]);
     }
   };
 
   const removerLocal = (index: number) => {
-    const novosLocais = [...locaisAtendimento];
-    novosLocais.splice(index, 1);
-    setLocaisAtendimento(novosLocais);
+    const novos = [...locaisAtendimento];
+    novos.splice(index, 1);
+    setLocaisAtendimento(novos);
   };
 
-  const atualizarLocal = (index: number, campo: string, valor: string) => {
-    const novosLocais = [...locaisAtendimento];
-    novosLocais[index][campo] = valor;
-    setLocaisAtendimento(novosLocais);
+  const atualizarLocal = (index: number, campo: string, valor: any) => {
+    const atualizados = [...locaisAtendimento];
+    atualizados[index][campo] = valor;
+    setLocaisAtendimento(atualizados);
   };
 
-  return (
-    <div style={{ padding: "2rem", fontFamily: "Arial" }}>
-      <h2>Painel do Profissional</h2>
+  const alternarPlano = (index: number, plano: string) => {
+    const atual = locaisAtendimento[index];
+    const novos = [...locaisAtendimento];
+    const lista = atual.planos || [];
+    if (lista.includes(plano)) {
+      novos[index].planos = lista.filter((p: string) => p !== plano);
+    } else {
+      novos[index].planos = [...lista, plano];
+    }
+    setLocaisAtendimento(novos);
+  };
 
-      {userEmail && <p><strong>E-mail:</strong> {userEmail}</p>}
+  const alternarBairro = (index: number, bairro: string) => {
+    const atual = locaisAtendimento[index];
+    const novos = [...locaisAtendimento];
+    const lista = atual.bairros || [];
+    if (lista.includes(bairro)) {
+      novos[index].bairros = lista.filter((b: string) => b !== bairro);
+    } else {
+      novos[index].bairros = [...lista, bairro];
+    }
+    setLocaisAtendimento(novos);
+  };
 
-      {fotoUrl ? (
-        <img
-          src={fotoUrl}
-          alt="Sua foto de perfil"
-          style={{
-            width: "150px",
-            height: "200px",
-            objectFit: "cover",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            marginBottom: "1rem",
-          }}
-        />
-      ) : (
-        <p style={{ marginBottom: "1rem" }}>Foto não encontrada ou ainda não enviada.</p>
-      )}
+  const alternarAtendimento = (index: number, tipo: string) => {
+    const atual = locaisAtendimento[index];
+    const novos = [...locaisAtendimento];
+    const lista = atual.atendimento || [];
+    if (lista.includes(tipo)) {
+      novos[index].atendimento = lista.filter((a: string) => a !== tipo);
+    } else {
+      novos[index].atendimento = [...lista, tipo];
+    }
+    setLocaisAtendimento(novos);
+  };
+<>
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Pronome de tratamento:</label><br />
+    <select value={pronome} onChange={(e) => setPronome(e.target.value)}>
+      <option value="">Nenhum</option>
+      <option value="Dr.">Dr.</option>
+      <option value="Dra.">Dra.</option>
+    </select>
+  </div>
 
-      {carregando ? (
-        <p>Carregando dados...</p>
-      ) : (
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Sexo:</label><br />
+    <select value={sexo} onChange={(e) => setSexo(e.target.value)}>
+      <option value="">Selecione</option>
+      <option value="Masculino">Masculino</option>
+      <option value="Feminino">Feminino</option>
+    </select>
+  </div>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Nome:</label><br />
+    <input value={nome} onChange={(e) => setNome(e.target.value)} />
+  </div>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Profissão:</label><br />
+    <input value={profissao} onChange={(e) => setProfissao(e.target.value)} />
+  </div>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Especialidade:</label><br />
+    <input value={especialidade} onChange={(e) => setEspecialidade(e.target.value)} />
+  </div>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Currículo resumido:</label><br />
+    <textarea value={curriculoResumido} onChange={(e) => setCurriculoResumido(e.target.value)} />
+  </div>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Currículo completo:</label><br />
+    <textarea value={curriculoCompleto} onChange={(e) => setCurriculoCompleto(e.target.value)} />
+  </div>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Nome do Conselho:</label><br />
+    <input value={conselhoNome} onChange={(e) => setConselhoNome(e.target.value)} />
+  </div>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Número do Conselho:</label><br />
+    <input value={conselhoNumero} onChange={(e) => setConselhoNumero(e.target.value)} />
+  </div>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <label>Áreas de Destaque:</label><br />
+    <input
+      value={novaArea}
+      onChange={(e) => setNovaArea(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const nova = novaArea.trim();
+          if (
+            nova &&
+            nova.length <= 15 &&
+            !areasDestaque.includes(nova) &&
+            areasDestaque.length < 10
+          ) {
+            setAreasDestaque([...areasDestaque, nova]);
+            setNovaArea("");
+          }
+        }
+      }}
+    />
+    <div>
+      {areasDestaque.map((a, i) => (
+        <span key={i} style={{ marginRight: "6px" }}>
+          {a}
+          <button onClick={() => setAreasDestaque(areasDestaque.filter((_, idx) => idx !== i))}>×</button>
+        </span>
+      ))}
+    </div>
+  </div>
+
+  <h3>Locais de Atendimento</h3>
+
+  {locaisAtendimento.map((local, i) => (
+    <div key={i} style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem" }}>
+      <label>Tipo:</label><br />
+      <select value={local.tipo} onChange={(e) => atualizarLocal(i, "tipo", e.target.value)}>
+        <option value="">Selecione</option>
+        <option value="consultório particular">Consultório particular</option>
+        <option value="clínica">Clínica</option>
+        <option value="hospital">Hospital</option>
+        <option value="atendimento domiciliar">Atendimento domiciliar</option>
+      </select>
+
+      {["consultório particular", "clínica", "hospital"].includes(local.tipo) && (
         <>
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Pronome de tratamento:</label><br />
-            <select value={pronome} onChange={(e) => setPronome(e.target.value)}>
-              <option value="">Nenhum</option>
-              <option value="Dr.">Dr.</option>
-              <option value="Dra.">Dra.</option>
-            </select>
-          </div>
-
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Sexo:</label><br />
-            <select value={sexo} onChange={(e) => setSexo(e.target.value)}>
+          <div style={{ marginTop: "0.5rem" }}>
+            <label>País:</label><br />
+            <select value={local.pais} onChange={(e) => atualizarLocal(i, "pais", e.target.value)}>
               <option value="">Selecione</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Feminino">Feminino</option>
+              {paises.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
             </select>
           </div>
 
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Nome:</label><br />
-            <input value={nome} onChange={(e) => setNome(e.target.value)} style={{ width: "300px" }} />
-          </div>
-
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Profissão:</label><br />
-            <input value={profissao} onChange={(e) => setProfissao(e.target.value)} style={{ width: "300px" }} />
-          </div>
-
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Especialidade:</label><br />
-            <input value={especialidade} onChange={(e) => setEspecialidade(e.target.value)} style={{ width: "300px" }} />
-          </div>
-
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Currículo resumido (até 100 palavras):</label><br />
-            <textarea
-              value={curriculoResumido}
-              onChange={(e) => setCurriculoResumido(e.target.value)}
-              style={{ width: "400px", height: "100px" }}
-              maxLength={1000}
-            />
-          </div>
-
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Currículo completo (até 1000 palavras):</label><br />
-            <textarea
-              value={curriculoCompleto}
-              onChange={(e) => setCurriculoCompleto(e.target.value)}
-              style={{ width: "600px", height: "200px" }}
-              maxLength={10000}
-            />
-          </div>
-
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Nome do conselho profissional (até 20 letras):</label><br />
-            <input
-              value={conselhoNome}
-              onChange={(e) => setConselhoNome(e.target.value)}
-              maxLength={20}
-              style={{ width: "300px" }}
-            />
-          </div>
-
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Número do conselho profissional (até 20 dígitos):</label><br />
-            <input
-              value={conselhoNumero}
-              onChange={(e) => setConselhoNumero(e.target.value)}
-              maxLength={20}
-              style={{ width: "300px" }}
-            />
-          </div>
-
-          <div style={{ marginBottom: "1rem" }}>
-            <label>Áreas de destaque (máx. 10, até 15 letras cada):</label><br />
-            <input
-              value={novaArea}
-              onChange={(e) => setNovaArea(e.target.value)}
-              list="sugestoes"
-              placeholder="Digite e pressione Enter"
-              style={{ width: "400px" }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  const nova = novaArea.trim().toLowerCase();
-                  if (
-                    nova &&
-                    nova.length <= 15 &&
-                    !areasDestaque.includes(nova) &&
-                    areasDestaque.length < 10
-                  ) {
-                    setAreasDestaque([...areasDestaque, nova]);
-                    setNovaArea("");
-                  }
-                }
-              }}
-            />
-            <datalist id="sugestoes">
-              {sugestoesFixas.map((s, i) => (
-                <option key={i} value={s} />
+          <div style={{ marginTop: "0.5rem" }}>
+            <label>Estado:</label><br />
+            <select value={local.estado} onChange={(e) => atualizarLocal(i, "estado", e.target.value)}>
+              <option value="">Selecione</option>
+              {estados.map((p) => (
+                <option key={p} value={p}>{p}</option>
               ))}
-            </datalist>
-            <div style={{ marginTop: "0.5rem" }}>
-              {areasDestaque.map((item, i) => (
-                <span
-                  key={i}
-                  style={{
-                    padding: "4px 8px",
-                    backgroundColor: "#f0f0f0",
-                    borderRadius: "4px",
-                    marginRight: "6px",
-                    display: "inline-block",
-                    marginBottom: "4px",
-                  }}
-                >
-                  {item}{" "}
-                  <button
-                    onClick={() => {
-                      setAreasDestaque(areasDestaque.filter((_, idx) => idx !== i));
-                    }}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "red",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
+            </select>
           </div>
 
-          <h3 style={{ marginTop: "2rem" }}>Locais de Atendimento</h3>
+          <div style={{ marginTop: "0.5rem" }}>
+            <label>Cidade:</label><br />
+            <select value={local.cidade} onChange={(e) => atualizarLocal(i, "cidade", e.target.value)}>
+              <option value="">Selecione</option>
+              {(cidades[local.estado] || []).map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
 
-          {locaisAtendimento.map((local, index) => (
-            <div
-              key={index}
-              style={{
-                border: "1px solid #ccc",
-                padding: "1rem",
-                marginBottom: "1rem",
-                borderRadius: "8px",
-              }}
-            >
-              <h4>Local {index + 1}</h4>
-
-              <label>Tipo de local:</label><br />
-              <select
-                value={local.tipo}
-                onChange={(e) => atualizarLocal(index, "tipo", e.target.value)}
-              >
-                <option value="">Selecione</option>
-                <option value="consultório particular">Consultório particular</option>
-                <option value="clínica">Clínica</option>
-                <option value="hospital">Hospital</option>
-                <option value="atendimento domiciliar">Atendimento domiciliar</option>
-              </select>
-
-              <div style={{ marginTop: "0.5rem" }}>
-                <label>Endereço:</label><br />
-                <input
-                  value={local.endereco}
-                  onChange={(e) => atualizarLocal(index, "endereco", e.target.value)}
-                  style={{ width: "400px" }}
-                />
-              </div>
-
-              <div style={{ marginTop: "0.5rem" }}>
-                <label>Telefone:</label><br />
-                <input
-                  value={local.telefone}
-                  onChange={(e) => atualizarLocal(index, "telefone", e.target.value)}
-                  style={{ width: "300px" }}
-                />
-              </div>
-
-              <div style={{ marginTop: "0.5rem" }}>
-                <label>Email:</label><br />
-                <input
-                  value={local.email}
-                  onChange={(e) => atualizarLocal(index, "email", e.target.value)}
-                  style={{ width: "300px" }}
-                />
-              </div>
-
-              <button
-                onClick={() => removerLocal(index)}
-                style={{
-                  marginTop: "0.5rem",
-                  backgroundColor: "#f8d7da",
-                  color: "#721c24",
-                  border: "1px solid #f5c6cb",
-                  padding: "4px 8px",
-                  borderRadius: "4px",
-                  cursor: "pointer"
-                }}
-              >
-                Remover este local
-              </button>
-            </div>
-          ))}
-
-          {locaisAtendimento.length < 5 && (
-            <button
-              onClick={adicionarLocal}
-              style={{
-                backgroundColor: "#d4edda",
-                color: "#155724",
-                border: "1px solid #c3e6cb",
-                padding: "6px 12px",
-                borderRadius: "4px",
-                cursor: "pointer",
-                marginBottom: "1rem"
-              }}
-            >
-              Adicionar novo local
-            </button>
-          )}
-
-          <button onClick={salvarDados} disabled={salvando}>
-            {salvando ? "Salvando..." : "Salvar Dados"}
-          </button>
+          <input placeholder="CEP" value={local.cep} onChange={(e) => atualizarLocal(i, "cep", e.target.value)} />
+          <input placeholder="Rua e número" value={local.endereco} onChange={(e) => atualizarLocal(i, "endereco", e.target.value)} />
+          <input placeholder="Complemento" value={local.complemento} onChange={(e) => atualizarLocal(i, "complemento", e.target.value)} />
+          <input placeholder="Telefone" value={local.telefone} onChange={(e) => atualizarLocal(i, "telefone", e.target.value)} />
+          <input placeholder="Email" value={local.email} onChange={(e) => atualizarLocal(i, "email", e.target.value)} />
         </>
       )}
+
+      {local.tipo === "atendimento domiciliar" && (
+        <>
+          <select value={local.pais} onChange={(e) => atualizarLocal(i, "pais", e.target.value)}>
+            <option value="">País</option>
+            {paises.map((p) => <option key={p}>{p}</option>)}
+          </select>
+          <select value={local.estado} onChange={(e) => atualizarLocal(i, "estado", e.target.value)}>
+            <option value="">Estado</option>
+            {estados.map((p) => <option key={p}>{p}</option>)}
+          </select>
+          <select value={local.cidade} onChange={(e) => atualizarLocal(i, "cidade", e.target.value)}>
+            <option value="">Cidade</option>
+            {(cidades[local.estado] || []).map((c) => <option key={c}>{c}</option>)}
+          </select>
+          <label>Bairros:</label><br />
+          {(bairros[local.cidade] || []).map((b) => (
+            <label key={b} style={{ marginRight: "8px" }}>
+              <input
+                type="checkbox"
+                checked={local.bairros?.includes(b)}
+                onChange={() => alternarBairro(i, b)}
+              />
+              {b}
+            </label>
+          ))}
+          <input placeholder="Telefone" value={local.telefone} onChange={(e) => atualizarLocal(i, "telefone", e.target.value)} />
+          <input placeholder="WhatsApp" value={local.whatsapp} onChange={(e) => atualizarLocal(i, "whatsapp", e.target.value)} />
+          <input placeholder="Email" value={local.email} onChange={(e) => atualizarLocal(i, "email", e.target.value)} />
+        </>
+      )}
+
+      <label>Tipo de atendimento:</label><br />
+      {["particular", "plano de saúde"].map((tipo) => (
+        <label key={tipo} style={{ marginRight: "10px" }}>
+          <input
+            type="checkbox"
+            checked={local.atendimento?.includes(tipo)}
+            onChange={() => alternarAtendimento(i, tipo)}
+          />
+          {tipo}
+        </label>
+      ))}
+
+      {local.atendimento?.includes("plano de saúde") && (
+        <div style={{ marginTop: "0.5rem" }}>
+          <label>Planos aceitos:</label><br />
+          {planosSaude.map((p) => (
+            <label key={p} style={{ marginRight: "8px" }}>
+              <input
+                type="checkbox"
+                checked={local.planos?.includes(p)}
+                onChange={() => alternarPlano(i, p)}
+              />
+              {p}
+            </label>
+          ))}
+        </div>
+      )}
+
+      <div style={{ marginTop: "1rem" }}>
+        <button onClick={() => removerLocal(i)}>Remover local</button>
+      </div>
     </div>
-  );
-}
+  ))}
+
+  {locaisAtendimento.length < 5 && (
+    <button onClick={adicionarLocal}>Adicionar local de atendimento</button>
+  )}
+
+  <div style={{ marginTop: "2rem" }}>
+    <button onClick={salvarDados} disabled={salvando}>
+      {salvando ? "Salvando..." : "Salvar dados"}
+    </button>
+  </div>
+</>
