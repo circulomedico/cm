@@ -13,8 +13,12 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, senha);
       setLogado(true);
       setErro('');
-    } catch (err) {
-      setErro('Erro ao fazer login. Verifique seu e-mail e senha.');
+    } catch (err: any) {
+      if (err.code) {
+        setErro(`Erro de autenticação: ${err.code}`);
+      } else {
+        setErro('Erro desconhecido ao fazer login.');
+      }
     }
   };
 
