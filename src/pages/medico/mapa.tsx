@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
@@ -67,15 +68,14 @@ export default function MapaProfissional() {
             setLocaisAtendimento(dados.locaisAtendimento || []);
           }
         } catch (err) {
-          console.log("Erro ao carregar dados do Firestore:", err);
+          console.log("Erro ao carregar dados:", err);
         }
-
         setCarregando(false);
       }
     });
-
     return () => unsubscribe();
   }, []);
+
   const salvarDados = async () => {
     if (!userEmail) return;
     setSalvando(true);
@@ -103,25 +103,27 @@ export default function MapaProfissional() {
 
   const adicionarLocal = () => {
     if (locaisAtendimento.length < 5) {
-      setLocaisAtendimento([
-        ...locaisAtendimento,
-        {
-          tipo: "",
-          pais: "",
-          estado: "",
-          cidade: "",
-          cep: "",
-          endereco: "",
-          complemento: "",
-          telefone: "",
-          whatsapp: "",
-          email: "",
-          bairros: [],
-          atendimento: [],
-          planos: [],
-        },
-      ]);
+      setLocaisAtendimento([...locaisAtendimento, {
+        tipo: "",
+        pais: "",
+        estado: "",
+        cidade: "",
+        endereco: "",
+        cep: "",
+        complemento: "",
+        telefone: "",
+        email: "",
+        atendimento: [],
+        planos: [],
+        bairros: []
+      }]);
     }
+  };
+
+  const atualizarLocal = (index: number, campo: string, valor: any) => {
+    const novos = [...locaisAtendimento];
+    novos[index][campo] = valor;
+    setLocaisAtendimento(novos);
   };
 
   const removerLocal = (index: number) => {
@@ -130,257 +132,113 @@ export default function MapaProfissional() {
     setLocaisAtendimento(novos);
   };
 
-  const atualizarLocal = (index: number, campo: string, valor: any) => {
-    const atualizados = [...locaisAtendimento];
-    atualizados[index][campo] = valor;
-    setLocaisAtendimento(atualizados);
-  };
+  return <div style={{ padding: 20 }}>
+    <h2>Painel do Profissional</h2>
+    {carregando ? "Carregando..." : <>
+      {/* Campos anteriores omitidos para foco no Bloco 4 Parte 2 */}
 
-  const alternarPlano = (index: number, plano: string) => {
-    const atual = locaisAtendimento[index];
-    const novos = [...locaisAtendimento];
-    const lista = atual.planos || [];
-    if (lista.includes(plano)) {
-      novos[index].planos = lista.filter((p: string) => p !== plano);
-    } else {
-      novos[index].planos = [...lista, plano];
-    }
-    setLocaisAtendimento(novos);
-  };
+      <h3>Locais de Atendimento</h3>
+      {locaisAtendimento.map((local, i) => (
+        <div key={i} style={{ border: "1px solid #ccc", padding: 10, marginBottom: 10 }}>
+          <strong>Local {i + 1}</strong><br />
+          <label>Tipo:</label><br />
+          <select value={local.tipo} onChange={e => atualizarLocal(i, "tipo", e.target.value)}>
+            <option value="">Selecione</option>
+            <option value="consultório particular">Consultório particular</option>
+            <option value="clínica">Clínica</option>
+            <option value="hospital">Hospital</option>
+            <option value="atendimento domiciliar">Atendimento domiciliar</option>
+          </select><br /><br />
 
-  const alternarBairro = (index: number, bairro: string) => {
-    const atual = locaisAtendimento[index];
-    const novos = [...locaisAtendimento];
-    const lista = atual.bairros || [];
-    if (lista.includes(bairro)) {
-      novos[index].bairros = lista.filter((b: string) => b !== bairro);
-    } else {
-      novos[index].bairros = [...lista, bairro];
-    }
-    setLocaisAtendimento(novos);
-  };
+          <label>País:</label><br />
+          <select value={local.pais} onChange={e => atualizarLocal(i, "pais", e.target.value)}>
+            {paises.map(p => <option key={p} value={p}>{p}</option>)}
+          </select><br />
 
-  const alternarAtendimento = (index: number, tipo: string) => {
-    const atual = locaisAtendimento[index];
-    const novos = [...locaisAtendimento];
-    const lista = atual.atendimento || [];
-    if (lista.includes(tipo)) {
-      novos[index].atendimento = lista.filter((a: string) => a !== tipo);
-    } else {
-      novos[index].atendimento = [...lista, tipo];
-    }
-    setLocaisAtendimento(novos);
-  };
-<>
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Pronome de tratamento:</label><br />
-    <select value={pronome} onChange={(e) => setPronome(e.target.value)}>
-      <option value="">Nenhum</option>
-      <option value="Dr.">Dr.</option>
-      <option value="Dra.">Dra.</option>
-    </select>
-  </div>
+          <label>Estado:</label><br />
+          <select value={local.estado} onChange={e => atualizarLocal(i, "estado", e.target.value)}>
+            {estados.map(e => <option key={e} value={e}>{e}</option>)}
+          </select><br />
 
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Sexo:</label><br />
-    <select value={sexo} onChange={(e) => setSexo(e.target.value)}>
-      <option value="">Selecione</option>
-      <option value="Masculino">Masculino</option>
-      <option value="Feminino">Feminino</option>
-    </select>
-  </div>
+          <label>Cidade:</label><br />
+          <select value={local.cidade} onChange={e => atualizarLocal(i, "cidade", e.target.value)}>
+            {(cidades[local.estado] || []).map(c => <option key={c} value={c}>{c}</option>)}
+          </select><br />
 
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Nome:</label><br />
-    <input value={nome} onChange={(e) => setNome(e.target.value)} />
-  </div>
-
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Profissão:</label><br />
-    <input value={profissao} onChange={(e) => setProfissao(e.target.value)} />
-  </div>
-
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Especialidade:</label><br />
-    <input value={especialidade} onChange={(e) => setEspecialidade(e.target.value)} />
-  </div>
-
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Currículo resumido:</label><br />
-    <textarea value={curriculoResumido} onChange={(e) => setCurriculoResumido(e.target.value)} />
-  </div>
-
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Currículo completo:</label><br />
-    <textarea value={curriculoCompleto} onChange={(e) => setCurriculoCompleto(e.target.value)} />
-  </div>
-
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Nome do Conselho:</label><br />
-    <input value={conselhoNome} onChange={(e) => setConselhoNome(e.target.value)} />
-  </div>
-
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Número do Conselho:</label><br />
-    <input value={conselhoNumero} onChange={(e) => setConselhoNumero(e.target.value)} />
-  </div>
-
-  <div style={{ marginBottom: "1rem" }}>
-    <label>Áreas de Destaque:</label><br />
-    <input
-      value={novaArea}
-      onChange={(e) => setNovaArea(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          const nova = novaArea.trim();
-          if (
-            nova &&
-            nova.length <= 15 &&
-            !areasDestaque.includes(nova) &&
-            areasDestaque.length < 10
-          ) {
-            setAreasDestaque([...areasDestaque, nova]);
-            setNovaArea("");
-          }
-        }
-      }}
-    />
-    <div>
-      {areasDestaque.map((a, i) => (
-        <span key={i} style={{ marginRight: "6px" }}>
-          {a}
-          <button onClick={() => setAreasDestaque(areasDestaque.filter((_, idx) => idx !== i))}>×</button>
-        </span>
-      ))}
-    </div>
-  </div>
-
-  <h3>Locais de Atendimento</h3>
-
-  {locaisAtendimento.map((local, i) => (
-    <div key={i} style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem" }}>
-      <label>Tipo:</label><br />
-      <select value={local.tipo} onChange={(e) => atualizarLocal(i, "tipo", e.target.value)}>
-        <option value="">Selecione</option>
-        <option value="consultório particular">Consultório particular</option>
-        <option value="clínica">Clínica</option>
-        <option value="hospital">Hospital</option>
-        <option value="atendimento domiciliar">Atendimento domiciliar</option>
-      </select>
-
-      {["consultório particular", "clínica", "hospital"].includes(local.tipo) && (
-        <>
-          <div style={{ marginTop: "0.5rem" }}>
-            <label>País:</label><br />
-            <select value={local.pais} onChange={(e) => atualizarLocal(i, "pais", e.target.value)}>
-              <option value="">Selecione</option>
-              {paises.map((p) => (
-                <option key={p} value={p}>{p}</option>
+          {local.tipo === "atendimento domiciliar" ? (
+            <>
+              <label>Bairros/Regiões:</label><br />
+              {(bairros[local.cidade] || []).map(b => (
+                <label key={b} style={{ display: "block" }}>
+                  <input
+                    type="checkbox"
+                    checked={local.bairros?.includes(b)}
+                    onChange={(e) => {
+                      const selecionados = local.bairros || [];
+                      const atualizados = e.target.checked
+                        ? [...selecionados, b]
+                        : selecionados.filter(x => x !== b);
+                      atualizarLocal(i, "bairros", atualizados);
+                    }}
+                  /> {b}
+                </label>
               ))}
-            </select>
-          </div>
+            </>
+          ) : (
+            <>
+              <label>CEP:</label><br />
+              <input value={local.cep} onChange={e => atualizarLocal(i, "cep", e.target.value)} /><br />
+              <label>Endereço:</label><br />
+              <input value={local.endereco} onChange={e => atualizarLocal(i, "endereco", e.target.value)} /><br />
+              <label>Complemento:</label><br />
+              <input value={local.complemento} onChange={e => atualizarLocal(i, "complemento", e.target.value)} /><br />
+            </>
+          )}
 
-          <div style={{ marginTop: "0.5rem" }}>
-            <label>Estado:</label><br />
-            <select value={local.estado} onChange={(e) => atualizarLocal(i, "estado", e.target.value)}>
-              <option value="">Selecione</option>
-              {estados.map((p) => (
-                <option key={p} value={p}>{p}</option>
+          <label>Telefone:</label><br />
+          <input value={local.telefone} onChange={e => atualizarLocal(i, "telefone", e.target.value)} /><br />
+          <label>Email:</label><br />
+          <input value={local.email} onChange={e => atualizarLocal(i, "email", e.target.value)} /><br />
+
+          <label>Atendimento:</label><br />
+          <label><input type="checkbox" checked={local.atendimento?.includes("particular")} onChange={(e) => {
+            const atual = local.atendimento || [];
+            const atualizados = e.target.checked ? [...atual, "particular"] : atual.filter(a => a !== "particular");
+            atualizarLocal(i, "atendimento", atualizados);
+          }} /> Particular</label><br />
+          <label><input type="checkbox" checked={local.atendimento?.includes("plano")} onChange={(e) => {
+            const atual = local.atendimento || [];
+            const atualizados = e.target.checked ? [...atual, "plano"] : atual.filter(a => a !== "plano");
+            atualizarLocal(i, "atendimento", atualizados);
+          }} /> Plano de Saúde</label><br />
+
+          {local.atendimento?.includes("plano") && (
+            <>
+              <label>Planos aceitos:</label><br />
+              {planosSaude.map(p => (
+                <label key={p} style={{ display: "block" }}>
+                  <input type="checkbox" checked={local.planos?.includes(p)} onChange={(e) => {
+                    const atual = local.planos || [];
+                    const atualizados = e.target.checked ? [...atual, p] : atual.filter(x => x !== p);
+                    atualizarLocal(i, "planos", atualizados);
+                  }} /> {p}
+                </label>
               ))}
-            </select>
-          </div>
+            </>
+          )}
 
-          <div style={{ marginTop: "0.5rem" }}>
-            <label>Cidade:</label><br />
-            <select value={local.cidade} onChange={(e) => atualizarLocal(i, "cidade", e.target.value)}>
-              <option value="">Selecione</option>
-              {(cidades[local.estado] || []).map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-
-          <input placeholder="CEP" value={local.cep} onChange={(e) => atualizarLocal(i, "cep", e.target.value)} />
-          <input placeholder="Rua e número" value={local.endereco} onChange={(e) => atualizarLocal(i, "endereco", e.target.value)} />
-          <input placeholder="Complemento" value={local.complemento} onChange={(e) => atualizarLocal(i, "complemento", e.target.value)} />
-          <input placeholder="Telefone" value={local.telefone} onChange={(e) => atualizarLocal(i, "telefone", e.target.value)} />
-          <input placeholder="Email" value={local.email} onChange={(e) => atualizarLocal(i, "email", e.target.value)} />
-        </>
-      )}
-
-      {local.tipo === "atendimento domiciliar" && (
-        <>
-          <select value={local.pais} onChange={(e) => atualizarLocal(i, "pais", e.target.value)}>
-            <option value="">País</option>
-            {paises.map((p) => <option key={p}>{p}</option>)}
-          </select>
-          <select value={local.estado} onChange={(e) => atualizarLocal(i, "estado", e.target.value)}>
-            <option value="">Estado</option>
-            {estados.map((p) => <option key={p}>{p}</option>)}
-          </select>
-          <select value={local.cidade} onChange={(e) => atualizarLocal(i, "cidade", e.target.value)}>
-            <option value="">Cidade</option>
-            {(cidades[local.estado] || []).map((c) => <option key={c}>{c}</option>)}
-          </select>
-          <label>Bairros:</label><br />
-          {(bairros[local.cidade] || []).map((b) => (
-            <label key={b} style={{ marginRight: "8px" }}>
-              <input
-                type="checkbox"
-                checked={local.bairros?.includes(b)}
-                onChange={() => alternarBairro(i, b)}
-              />
-              {b}
-            </label>
-          ))}
-          <input placeholder="Telefone" value={local.telefone} onChange={(e) => atualizarLocal(i, "telefone", e.target.value)} />
-          <input placeholder="WhatsApp" value={local.whatsapp} onChange={(e) => atualizarLocal(i, "whatsapp", e.target.value)} />
-          <input placeholder="Email" value={local.email} onChange={(e) => atualizarLocal(i, "email", e.target.value)} />
-        </>
-      )}
-
-      <label>Tipo de atendimento:</label><br />
-      {["particular", "plano de saúde"].map((tipo) => (
-        <label key={tipo} style={{ marginRight: "10px" }}>
-          <input
-            type="checkbox"
-            checked={local.atendimento?.includes(tipo)}
-            onChange={() => alternarAtendimento(i, tipo)}
-          />
-          {tipo}
-        </label>
-      ))}
-
-      {local.atendimento?.includes("plano de saúde") && (
-        <div style={{ marginTop: "0.5rem" }}>
-          <label>Planos aceitos:</label><br />
-          {planosSaude.map((p) => (
-            <label key={p} style={{ marginRight: "8px" }}>
-              <input
-                type="checkbox"
-                checked={local.planos?.includes(p)}
-                onChange={() => alternarPlano(i, p)}
-              />
-              {p}
-            </label>
-          ))}
+          <br />
+          <button onClick={() => removerLocal(i)} style={{ background: "#fdd" }}>Remover local</button>
         </div>
+      ))}
+      {locaisAtendimento.length < 5 && (
+        <button onClick={adicionarLocal}>Adicionar novo local</button>
       )}
 
-      <div style={{ marginTop: "1rem" }}>
-        <button onClick={() => removerLocal(i)}>Remover local</button>
-      </div>
-    </div>
-  ))}
-
-  {locaisAtendimento.length < 5 && (
-    <button onClick={adicionarLocal}>Adicionar local de atendimento</button>
-  )}
-
-  <div style={{ marginTop: "2rem" }}>
-    <button onClick={salvarDados} disabled={salvando}>
-      {salvando ? "Salvando..." : "Salvar dados"}
-    </button>
-  </div>
-</>
+      <br /><br />
+      <button onClick={salvarDados} disabled={salvando}>
+        {salvando ? "Salvando..." : "Salvar Dados"}
+      </button>
+    </>}
+  </div>;
+}
