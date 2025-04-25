@@ -16,15 +16,29 @@ export default function MapaProfissional() {
   const [curriculoCompleto, setCurriculoCompleto] = useState("");
   const [conselhoNome, setConselhoNome] = useState("");
   const [conselhoNumero, setConselhoNumero] = useState("");
+  const [areasDestaque, setAreasDestaque] = useState<string[]>([]);
+  const [novaArea, setNovaArea] = useState("");
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
+
+  const sugestoesFixas = [
+    "epilepsia",
+    "Parkinson",
+    "tumor cerebral",
+    "AVC",
+    "microcirurgia",
+    "cirurgia funcional",
+    "hospital HC",
+    "Unifesp",
+    "neuroimagem",
+    "coluna cervical"
+  ];
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user?.email) {
         setUserEmail(user.email);
 
-        // Foto de perfil
         try {
           const storage = getStorage();
           const fotoRef = ref(storage, `fotos-perfil/${user.email}.jpg`);
@@ -34,7 +48,6 @@ export default function MapaProfissional() {
           console.log("Foto não encontrada.");
         }
 
-        // Dados do Firestore
         try {
           const docRef = doc(db, "profissionais", user.email);
           const docSnap = await getDoc(docRef);
@@ -49,6 +62,7 @@ export default function MapaProfissional() {
             setCurriculoCompleto(dados.curriculoCompleto || "");
             setConselhoNome(dados.conselhoNome || "");
             setConselhoNumero(dados.conselhoNumero || "");
+            setAreasDestaque(dados.areasDestaque || []);
           }
         } catch (err) {
           console.log("Erro ao carregar dados do Firestore:", err);
@@ -75,6 +89,7 @@ export default function MapaProfissional() {
         curriculoCompleto,
         conselhoNome,
         conselhoNumero,
+        areasDestaque,
       });
       alert("Dados salvos com sucesso!");
     } catch (err) {
@@ -182,6 +197,68 @@ export default function MapaProfissional() {
               maxLength={20}
               style={{ width: "300px" }}
             />
+          </div>
+
+          <div style={{ marginBottom: "1rem" }}>
+            <label>Áreas de destaque (máx. 10, até 15 letras cada):</label><br />
+            <input
+              value={novaArea}
+              onChange={(e) => setNovaArea(e.target.value)}
+              list="sugestoes"
+              placeholder="Digite e pressione Enter"
+              style={{ width: "400px" }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const nova = novaArea.trim().toLowerCase();
+                  if (
+                    nova &&
+                    nova.length <= 15 &&
+                    !areasDestaque.includes(nova) &&
+                    areasDestaque.length < 10
+                  ) {
+                    setAreasDestaque([...areasDestaque, nova]);
+                    setNovaArea("");
+                  }
+                }
+              }}
+            />
+            <datalist id="sugestoes">
+              {sugestoesFixas.map((s, i) => (
+                <option key={i} value={s} />
+              ))}
+            </datalist>
+            <div style={{ marginTop: "0.5rem" }}>
+              {areasDestaque.map((item, i) => (
+                <span
+                  key={i}
+                  style={{
+                    padding: "4px 8px",
+                    backgroundColor: "#f0f0f0",
+                    borderRadius: "4px",
+                    marginRight: "6px",
+                    display: "inline-block",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {item}{" "}
+                  <button
+                    onClick={() => {
+                      setAreasDestaque(areasDestaque.filter((_, idx) => idx !== i));
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "red",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
           </div>
 
           <button onClick={salvarDados} disabled={salvando}>
