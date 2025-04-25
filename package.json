@@ -1,21 +1,21 @@
 {
   "name": "circulo-medico",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "devDependencies": {
-  "typescript": "^5.0.0",
-  "@types/react": "^18.0.0"
-}
-
     "firebase": "^9.0.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
     "react-easy-crop": "^4.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/react": "^18.0.0"
   }
 }
