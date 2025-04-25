@@ -1,5 +1,3 @@
-// src/pages/medico/foto.tsx
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { auth } from '../../firebase/firebaseConfig';
@@ -84,6 +82,3 @@ export default function FotoPage() {
     </div>
   );
 }
-
-Adiciona página de upload com crop 3x4
-
