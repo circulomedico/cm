@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
@@ -26,16 +25,28 @@ export default function MapaProfissional() {
 
   useEffect(() => {
     const carregarListas = async () => {
-      const docRef = doc(db, "listas", "profissoes");
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        setListaProfissoes(snap.data().valores || []);
-      }
+      try {
+        const docRef = doc(db, "listas", "profissoes");
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const valoresProfissoes = snap.data().valores || [];
+          console.log("Profissões carregadas do Firestore:", valoresProfissoes);
+          setListaProfissoes(valoresProfissoes);
+        } else {
+          console.log("Documento de profissões não encontrado no Firestore.");
+        }
 
-      const especialidadesRef = doc(db, "listas", "especialidades_Medicina");
-      const snapEsp = await getDoc(especialidadesRef);
-      if (snapEsp.exists()) {
-        setListaEspecialidades(snapEsp.data().valores || []);
+        const especialidadesRef = doc(db, "listas", "especialidades_Medicina");
+        const snapEsp = await getDoc(especialidadesRef);
+        if (snapEsp.exists()) {
+          const valoresEspecialidades = snapEsp.data().valores || [];
+          console.log("Especialidades carregadas do Firestore:", valoresEspecialidades);
+          setListaEspecialidades(valoresEspecialidades);
+        } else {
+          console.log("Documento de especialidades não encontrado no Firestore.");
+        }
+      } catch (error) {
+        console.error("Erro ao carregar listas do Firestore:", error);
       }
     };
     carregarListas();
