@@ -24,33 +24,46 @@ export default function MapaProfissional() {
   }, []);
 
   useEffect(() => {
-    const carregarListas = async () => {
+    const carregarListaProfissoes = async () => {
       try {
         const docRef = doc(db, "listas", "profissoes");
         const snap = await getDoc(docRef);
         if (snap.exists()) {
           const valoresProfissoes = snap.data().valores || [];
-          console.log("Profissões carregadas do Firestore:", valoresProfissoes);
           setListaProfissoes(valoresProfissoes);
-        } else {
-          console.log("Documento de profissões não encontrado no Firestore.");
-        }
-
-        const especialidadesRef = doc(db, "listas", "especialidades_Medicina");
-        const snapEsp = await getDoc(especialidadesRef);
-        if (snapEsp.exists()) {
-          const valoresEspecialidades = snapEsp.data().valores || [];
-          console.log("Especialidades carregadas do Firestore:", valoresEspecialidades);
-          setListaEspecialidades(valoresEspecialidades);
-        } else {
-          console.log("Documento de especialidades não encontrado no Firestore.");
         }
       } catch (error) {
-        console.error("Erro ao carregar listas do Firestore:", error);
+        console.error("Erro ao carregar profissões:", error);
       }
     };
-    carregarListas();
+    carregarListaProfissoes();
   }, []);
+
+  useEffect(() => {
+    const carregarListaEspecialidades = async () => {
+      if (!profissao) {
+        setListaEspecialidades([]);
+        return;
+      }
+
+      const nomeDocumento = "especialidades_" + profissao.replace(/\s/g, "").replace(/ç/g, "c").replace(/ã/g, "a").replace(/á/g, "a").replace(/é/g, "e").replace(/í/g, "i").replace(/ó/g, "o").replace(/ú/g, "u");
+
+      try {
+        const docRef = doc(db, "listas", nomeDocumento);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const valoresEspecialidades = snap.data().valores || [];
+          setListaEspecialidades(valoresEspecialidades);
+        } else {
+          setListaEspecialidades([]);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar especialidades:", error);
+        setListaEspecialidades([]);
+      }
+    };
+    carregarListaEspecialidades();
+  }, [profissao]);
 
   return (
     <div style={{ padding: "2rem", fontFamily: "Arial" }}>
@@ -86,7 +99,7 @@ export default function MapaProfissional() {
 
       <div>
         <label>Profissão:</label><br />
-        <select value={profissao} onChange={(e) => setProfissao(e.target.value)}>
+        <select value={profissao} onChange={(e) => { setProfissao(e.target.value); setEspecialidade(""); }}>
           <option value="">Selecione</option>
           {listaProfissoes.map((p, idx) => (
             <option key={idx} value={p}>{p}</option>
@@ -96,7 +109,7 @@ export default function MapaProfissional() {
 
       <div>
         <label>Especialidade:</label><br />
-        <select value={especialidade} onChange={(e) => setEspecialidade(e.target.value)}>
+        <select value={especialidade} onChange={(e) => setEspecialidade(e.target.value)} disabled={!listaEspecialidades.length}>
           <option value="">Selecione</option>
           {listaEspecialidades.map((esp, idx) => (
             <option key={idx} value={esp}>{esp}</option>
