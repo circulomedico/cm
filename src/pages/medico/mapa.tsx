@@ -18,13 +18,13 @@ export default function MapaProfissional() {
   const [areasDestaque, setAreasDestaque] = useState<string[]>([]);
   const [inputArea, setInputArea] = useState("");
   const [sugestoes, setSugestoes] = useState<string[]>([]);
-  const [locaisAtendimento, setLocaisAtendimento] = useState<any[]>([]);
   const [listaProfissoes, setListaProfissoes] = useState<string[]>([]);
   const [listaEspecialidades, setListaEspecialidades] = useState<string[]>([]);
   const [listaAreasDestaque, setListaAreasDestaque] = useState<string[]>([]);
+  const [locaisAtendimento, setLocaisAtendimento] = useState<any[]>([]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user?.email) {
         setUserEmail(user.email);
       }
@@ -54,7 +54,7 @@ export default function MapaProfissional() {
   }, []);
 
   useEffect(() => {
-    const carregarListaEspecialidades = async () => {
+    const carregarEspecialidades = async () => {
       if (!profissao) {
         setListaEspecialidades([]);
         return;
@@ -73,7 +73,7 @@ export default function MapaProfissional() {
         setListaEspecialidades([]);
       }
     };
-    carregarListaEspecialidades();
+    carregarEspecialidades();
   }, [profissao]);
 
   const adicionarArea = (area: string) => {
@@ -97,26 +97,6 @@ export default function MapaProfissional() {
     setAreasDestaque(areasDestaque.filter((a) => a !== area));
   };
 
-  const adicionarLocalAtendimento = () => {
-    if (locaisAtendimento.length >= 5) {
-      alert("Você pode adicionar no máximo 5 locais de atendimento.");
-      return;
-    }
-    setLocaisAtendimento([...locaisAtendimento, { tipo: "", endereco: "", telefone: "" }]);
-  };
-
-  const removerLocalAtendimento = (index: number) => {
-    const novosLocais = [...locaisAtendimento];
-    novosLocais.splice(index, 1);
-    setLocaisAtendimento(novosLocais);
-  };
-
-  const atualizarLocalAtendimento = (index: number, campo: string, valor: string) => {
-    const novosLocais = [...locaisAtendimento];
-    novosLocais[index][campo] = valor;
-    setLocaisAtendimento(novosLocais);
-  };
-
   const handleInputAreaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputArea(value);
@@ -133,6 +113,26 @@ export default function MapaProfissional() {
         adicionarArea(inputArea.trim());
       }
     }
+  };
+
+  const adicionarLocal = () => {
+    if (locaisAtendimento.length >= 5) {
+      alert("Máximo de 5 locais atingido");
+      return;
+    }
+    setLocaisAtendimento([...locaisAtendimento, { tipo: "", endereco: "", telefone: "" }]);
+  };
+
+  const removerLocal = (index: number) => {
+    const novos = [...locaisAtendimento];
+    novos.splice(index, 1);
+    setLocaisAtendimento(novos);
+  };
+
+  const atualizarLocal = (index: number, campo: string, valor: string) => {
+    const novos = [...locaisAtendimento];
+    novos[index][campo] = valor;
+    setLocaisAtendimento(novos);
   };
 
   return (
@@ -188,23 +188,13 @@ export default function MapaProfissional() {
       </div>
 
       <div>
-        <label>Nome do Conselho Profissional:</label><br />
-        <input value={nomeConselho} onChange={(e) => setNomeConselho(e.target.value)} maxLength={20} />
-      </div>
-
-      <div>
-        <label>Número do Conselho Profissional:</label><br />
-        <input value={numeroConselho} onChange={(e) => setNumeroConselho(e.target.value)} maxLength={20} />
-      </div>
-
-      <div>
         <label>Currículo Resumido:</label><br />
-        <textarea value={curriculoResumido} onChange={(e) => setCurriculoResumido(e.target.value)} rows={5} />
+        <textarea value={curriculoResumido} onChange={(e) => setCurriculoResumido(e.target.value)} />
       </div>
 
       <div>
         <label>Currículo Completo:</label><br />
-        <textarea value={curriculoCompleto} onChange={(e) => setCurriculoCompleto(e.target.value)} rows={10} />
+        <textarea value={curriculoCompleto} onChange={(e) => setCurriculoCompleto(e.target.value)} />
       </div>
 
       <div style={{ marginTop: "2rem" }}>
@@ -241,16 +231,16 @@ export default function MapaProfissional() {
 
       <div style={{ marginTop: "2rem" }}>
         <h3>Locais de Atendimento</h3>
-        <button onClick={adicionarLocalAtendimento}>Adicionar Local</button>
+        <button onClick={adicionarLocal}>Adicionar Local</button>
         {locaisAtendimento.map((local, idx) => (
-          <div key={idx} style={{ marginTop: "1rem", padding: "10px", border: "1px solid #ccc", borderRadius: "5px" }}>
-            <label>Tipo de Local:</label><br />
-            <input value={local.tipo} onChange={(e) => atualizarLocalAtendimento(idx, "tipo", e.target.value)} /><br />
+          <div key={idx} style={{ marginTop: "1rem", border: "1px solid #ccc", padding: "10px" }}>
+            <label>Tipo:</label><br />
+            <input value={local.tipo} onChange={(e) => atualizarLocal(idx, "tipo", e.target.value)} /><br />
             <label>Endereço:</label><br />
-            <input value={local.endereco} onChange={(e) => atualizarLocalAtendimento(idx, "endereco", e.target.value)} /><br />
+            <input value={local.endereco} onChange={(e) => atualizarLocal(idx, "endereco", e.target.value)} /><br />
             <label>Telefone:</label><br />
-            <input value={local.telefone} onChange={(e) => atualizarLocalAtendimento(idx, "telefone", e.target.value)} /><br />
-            <button onClick={() => removerLocalAtendimento(idx)} style={{ marginTop: "10px" }}>Remover</button>
+            <input value={local.telefone} onChange={(e) => atualizarLocal(idx, "telefone", e.target.value)} /><br />
+            <button onClick={() => removerLocal(idx)} style={{ marginTop: "10px" }}>Remover</button>
           </div>
         ))}
       </div>
