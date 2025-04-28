@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
@@ -19,6 +18,7 @@ export default function MapaProfissional() {
   const [areasDestaque, setAreasDestaque] = useState<string[]>([]);
   const [inputArea, setInputArea] = useState("");
   const [sugestoes, setSugestoes] = useState<string[]>([]);
+  const [locaisAtendimento, setLocaisAtendimento] = useState<any[]>([]);
   const [listaProfissoes, setListaProfissoes] = useState<string[]>([]);
   const [listaEspecialidades, setListaEspecialidades] = useState<string[]>([]);
   const [listaAreasDestaque, setListaAreasDestaque] = useState<string[]>([]);
@@ -59,7 +59,7 @@ export default function MapaProfissional() {
         setListaEspecialidades([]);
         return;
       }
-      const nomeDocumento = "especialidades_" + profissao.replace(/\s/g, "").replace(/ç/g, "c").replace(/ã/g, "a").replace(/á/g, "a").replace(/é/g, "e").replace(/í/g, "i").replace(/ó/g, "o").replace(/ú/g, "u");
+      const nomeDocumento = "especialidades_" + profissao.replace(/\s/g, "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       try {
         const docRef = doc(db, "listas", nomeDocumento);
         const snap = await getDoc(docRef);
@@ -97,10 +97,29 @@ export default function MapaProfissional() {
     setAreasDestaque(areasDestaque.filter((a) => a !== area));
   };
 
+  const adicionarLocalAtendimento = () => {
+    if (locaisAtendimento.length >= 5) {
+      alert("Você pode adicionar no máximo 5 locais de atendimento.");
+      return;
+    }
+    setLocaisAtendimento([...locaisAtendimento, { tipo: "", endereco: "", telefone: "" }]);
+  };
+
+  const removerLocalAtendimento = (index: number) => {
+    const novosLocais = [...locaisAtendimento];
+    novosLocais.splice(index, 1);
+    setLocaisAtendimento(novosLocais);
+  };
+
+  const atualizarLocalAtendimento = (index: number, campo: string, valor: string) => {
+    const novosLocais = [...locaisAtendimento];
+    novosLocais[index][campo] = valor;
+    setLocaisAtendimento(novosLocais);
+  };
+
   const handleInputAreaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputArea(value);
-
     const filtradas = listaAreasDestaque.filter((item) =>
       item.toLowerCase().includes(value.toLowerCase())
     );
@@ -170,34 +189,26 @@ export default function MapaProfissional() {
 
       <div>
         <label>Nome do Conselho Profissional:</label><br />
-        <input value={nomeConselho} maxLength={20} onChange={(e) => setNomeConselho(e.target.value)} />
+        <input value={nomeConselho} onChange={(e) => setNomeConselho(e.target.value)} maxLength={20} />
       </div>
 
       <div>
         <label>Número do Conselho Profissional:</label><br />
-        <input value={numeroConselho} maxLength={20} onChange={(e) => setNumeroConselho(e.target.value)} />
+        <input value={numeroConselho} onChange={(e) => setNumeroConselho(e.target.value)} maxLength={20} />
       </div>
 
       <div>
-        <label>Currículo Resumido (até 100 palavras):</label><br />
-        <textarea
-          value={curriculoResumido}
-          onChange={(e) => setCurriculoResumido(e.target.value)}
-          rows={5}
-        />
+        <label>Currículo Resumido:</label><br />
+        <textarea value={curriculoResumido} onChange={(e) => setCurriculoResumido(e.target.value)} rows={5} />
       </div>
 
       <div>
-        <label>Currículo Completo (até 1000 palavras):</label><br />
-        <textarea
-          value={curriculoCompleto}
-          onChange={(e) => setCurriculoCompleto(e.target.value)}
-          rows={10}
-        />
+        <label>Currículo Completo:</label><br />
+        <textarea value={curriculoCompleto} onChange={(e) => setCurriculoCompleto(e.target.value)} rows={10} />
       </div>
 
-      <div>
-        <label>Áreas de Destaque (máximo 10, até 20 letras cada):</label><br />
+      <div style={{ marginTop: "2rem" }}>
+        <label>Áreas de Destaque:</label><br />
         <input
           value={inputArea}
           onChange={handleInputAreaChange}
@@ -226,6 +237,22 @@ export default function MapaProfissional() {
             ))}
           </div>
         )}
+      </div>
+
+      <div style={{ marginTop: "2rem" }}>
+        <h3>Locais de Atendimento</h3>
+        <button onClick={adicionarLocalAtendimento}>Adicionar Local</button>
+        {locaisAtendimento.map((local, idx) => (
+          <div key={idx} style={{ marginTop: "1rem", padding: "10px", border: "1px solid #ccc", borderRadius: "5px" }}>
+            <label>Tipo de Local:</label><br />
+            <input value={local.tipo} onChange={(e) => atualizarLocalAtendimento(idx, "tipo", e.target.value)} /><br />
+            <label>Endereço:</label><br />
+            <input value={local.endereco} onChange={(e) => atualizarLocalAtendimento(idx, "endereco", e.target.value)} /><br />
+            <label>Telefone:</label><br />
+            <input value={local.telefone} onChange={(e) => atualizarLocalAtendimento(idx, "telefone", e.target.value)} /><br />
+            <button onClick={() => removerLocalAtendimento(idx)} style={{ marginTop: "10px" }}>Remover</button>
+          </div>
+        ))}
       </div>
     </div>
   );
