@@ -10,35 +10,6 @@ import { estadosBrasil, cidadesPorEstado } from "../../utils/cidadesBrasil";
 // AQUI nesta versão reduzida para envio no chat eu mostro apenas SP, RJ e MG como exemplo. 
 // Depois eu te ensino a carregar todas usando um JSON externo, se quiser!
 
-const cidadesPorEstado: { [key: string]: string[] } = {
-  "SP": [
-    "São Paulo",
-    "Campinas",
-    "Santos",
-    "São Bernardo do Campo",
-    "São José dos Campos",
-    "Ribeirão Preto",
-    "Sorocaba",
-    "Osasco",
-    "Santo André"
-  ],
-  "RJ": [
-    "Rio de Janeiro",
-    "Niterói",
-    "Campos dos Goytacazes",
-    "Duque de Caxias",
-    "Nova Iguaçu",
-    "Volta Redonda"
-  ],
-  "MG": [
-    "Belo Horizonte",
-    "Uberlândia",
-    "Contagem",
-    "Juiz de Fora",
-    "Betim",
-    "Montes Claros"
-  ]
-};
 
 export default function MapaProfissional() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
