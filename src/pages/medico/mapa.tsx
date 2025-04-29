@@ -151,8 +151,140 @@ export default function MapaProfissional() {
         </select>
       </div>
 
-      {/* Campos de profissão, especialidade, currículos, áreas de destaque, locais de atendimento 
-      virão depois, junto da integração das cidades! */}
+      <div style={{ marginTop: "2rem" }}>
+  <h3>Locais de Atendimento</h3>
+  <button onClick={adicionarLocal} style={{ marginBottom: "1rem" }}>
+    Adicionar Local
+  </button>
+
+  {locaisAtendimento.map((local, idx) => (
+    <div key={idx} style={{ marginBottom: "2rem", border: "1px solid #ccc", padding: "1rem" }}>
+      <div>
+        <label>Tipo de Local:</label><br />
+        <select
+          value={local.tipo}
+          onChange={(e) => atualizarLocal(idx, "tipo", e.target.value)}
+        >
+          <option value="">Selecione</option>
+          <option value="Consultório">Consultório Particular</option>
+          <option value="Clínica">Clínica</option>
+          <option value="Hospital">Hospital</option>
+          <option value="Domiciliar">Atendimento Domiciliar</option>
+        </select>
+      </div>
+
+      {local.tipo && (
+        <>
+          <div style={{ marginTop: "1rem" }}>
+            <label>Estado:</label><br />
+            <select
+              value={local.estado}
+              onChange={(e) => {
+                atualizarLocal(idx, "estado", e.target.value);
+                atualizarLocal(idx, "cidade", ""); // Reseta cidade se mudar estado
+              }}
+            >
+              <option value="">Selecione o Estado</option>
+              {estadosBrasil.map((estado) => (
+                <option key={estado.sigla} value={estado.sigla}>
+                  {estado.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {local.estado && (
+            <div style={{ marginTop: "1rem" }}>
+              <label>Cidade:</label><br />
+              <select
+                value={local.cidade}
+                onChange={(e) => atualizarLocal(idx, "cidade", e.target.value)}
+              >
+                <option value="">Selecione a Cidade</option>
+                {(cidadesPorEstado[local.estado] || []).map((cidade, index) => (
+                  <option key={index} value={cidade}>
+                    {cidade}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </>
+      )}
+
+      {["Consultório", "Clínica", "Hospital"].includes(local.tipo) && (
+        <>
+          <div style={{ marginTop: "1rem" }}>
+            <label>Rua:</label><br />
+            <input
+              type="text"
+              value={local.rua}
+              onChange={(e) => atualizarLocal(idx, "rua", e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Número:</label><br />
+            <input
+              type="text"
+              value={local.numero}
+              onChange={(e) => atualizarLocal(idx, "numero", e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Complemento:</label><br />
+            <input
+              type="text"
+              value={local.complemento}
+              onChange={(e) => atualizarLocal(idx, "complemento", e.target.value)}
+            />
+          </div>
+          <div>
+            <label>CEP:</label><br />
+            <input
+              type="text"
+              value={local.cep}
+              onChange={(e) => atualizarLocal(idx, "cep", e.target.value)}
+            />
+          </div>
+        </>
+      )}
+
+      <div style={{ marginTop: "1rem" }}>
+        <label>Telefone:</label><br />
+        <input
+          type="text"
+          value={local.telefone}
+          onChange={(e) => atualizarLocal(idx, "telefone", e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label>Whatsapp:</label><br />
+        <input
+          type="text"
+          value={local.whatsapp}
+          onChange={(e) => atualizarLocal(idx, "whatsapp", e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label>Email:</label><br />
+        <input
+          type="email"
+          value={local.email}
+          onChange={(e) => atualizarLocal(idx, "email", e.target.value)}
+        />
+      </div>
+
+      <button
+        onClick={() => removerLocal(idx)}
+        style={{ marginTop: "1rem", backgroundColor: "#f44336", color: "#fff" }}
+      >
+        Remover Local
+      </button>
+    </div>
+  ))}
+</div>
 
     </div>
   );
