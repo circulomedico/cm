@@ -60,6 +60,33 @@ export default function MapaProfissional() {
     carregarListas();
   }, []);
 
+  // Função para adicionar novo local
+const adicionarLocal = () => {
+  if (locaisAtendimento.length >= 5) {
+    alert("Você pode adicionar no máximo 5 locais de atendimento.");
+    return;
+  }
+  setLocaisAtendimento([
+    ...locaisAtendimento,
+    { tipo: "", estado: "", cidade: "", rua: "", numero: "", complemento: "", cep: "", telefone: "", whatsapp: "", email: "" }
+  ]);
+};
+
+// Função para remover local
+const removerLocal = (index: number) => {
+  const novosLocais = [...locaisAtendimento];
+  novosLocais.splice(index, 1);
+  setLocaisAtendimento(novosLocais);
+};
+
+// Função para atualizar campo de local
+const atualizarLocal = (index: number, campo: string, valor: string) => {
+  const novosLocais = [...locaisAtendimento];
+  novosLocais[index][campo] = valor;
+  setLocaisAtendimento(novosLocais);
+};
+
+
   return (
     <div style={{ padding: "2rem", fontFamily: "Arial" }}>
       <h2>Painel do Profissional</h2>
