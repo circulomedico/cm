@@ -253,26 +253,61 @@ const atualizarLocal = (index: number, campo: string, valor: string) => {
     type="text"
     value={inputArea}
     onChange={(e) => setInputArea(e.target.value)}
+    placeholder="Digite uma palavra e pressione Enter"
     onKeyDown={(e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        if (inputArea.trim() && areasDestaque.length < 10) {
-          if (inputArea.length <= 20) {
-            setAreasDestaque([...areasDestaque, inputArea.trim()]);
-            setInputArea("");
-          } else {
-            alert("Cada área de destaque pode ter no máximo 20 letras.");
-          }
+        const novaArea = inputArea.trim();
+        if (novaArea.length > 20) {
+          alert("Cada área de destaque pode ter no máximo 20 letras.");
         } else if (areasDestaque.length >= 10) {
           alert("Você pode adicionar no máximo 10 áreas de destaque.");
+        } else if (novaArea && !areasDestaque.includes(novaArea)) {
+          setAreasDestaque([...areasDestaque, novaArea]);
+          setInputArea("");
         }
       }
     }}
-    placeholder="Pressione Enter para adicionar"
+    list="sugestoes-areas"
   />
-  <div style={{ marginTop: "0.5rem" }}>
-    <strong>Já incluídas:</strong> {areasDestaque.join(", ")}
-  </div>
+
+  {/* Sugestões vindas da lista do Firestore */}
+  <datalist id="sugestoes-areas">
+    {listaAreasDestaque.map((area, index) => (
+      <option key={index} value={area} />
+    ))}
+  </datalist>
+
+  {/* Mostrar áreas já adicionadas */}
+  {areasDestaque.length > 0 && (
+    <div style={{ marginTop: "1rem" }}>
+      <strong>Já incluídas:</strong>
+      <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+        {areasDestaque.map((area, index) => (
+          <li key={index} style={{ marginBottom: "5px" }}>
+            {area}{" "}
+            <button
+              onClick={() => {
+                const novasAreas = areasDestaque.filter((_, idx) => idx !== index);
+                setAreasDestaque(novasAreas);
+              }}
+              style={{
+                marginLeft: "10px",
+                backgroundColor: "#f44336",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                padding: "2px 6px",
+                cursor: "pointer"
+              }}
+            >
+              X
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
 </div>
 
         
