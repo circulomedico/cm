@@ -60,6 +60,28 @@ export default function MapaProfissional() {
     carregarListas();
   }, []);
 
+  useEffect(() => {
+  const carregarEspecialidades = async () => {
+    try {
+      if (profissao) {
+        const especialidadesRef = doc(db, "listas", `especialidades_${profissao}`);
+        const especialidadesSnap = await getDoc(especialidadesRef);
+        if (especialidadesSnap.exists()) {
+          setListaEspecialidades(especialidadesSnap.data().valores || []);
+        } else {
+          setListaEspecialidades([]);
+        }
+      } else {
+        setListaEspecialidades([]);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar especialidades:", error);
+    }
+  };
+  carregarEspecialidades();
+}, [profissao]);
+
+
   // Função para adicionar novo local
 const adicionarLocal = () => {
   if (locaisAtendimento.length >= 5) {
@@ -85,6 +107,36 @@ const atualizarLocal = (index: number, campo: string, valor: string) => {
   novosLocais[index][campo] = valor;
   setLocaisAtendimento(novosLocais);
 };
+
+ const handleSalvar = async () => {
+  if (!userEmail) {
+    alert("Usuário não autenticado!");
+    return;
+  }
+
+  try {
+    const perfilRef = doc(db, "profissionais", userEmail);
+    await setDoc(perfilRef, {
+      pronome,
+      nome,
+      sobrenome,
+      sexo,
+      profissao,
+      especialidade,
+      nomeConselho,
+      numeroConselho,
+      curriculoResumido,
+      curriculoCompleto,
+      areasDestaque,
+      locaisAtendimento
+    });
+    alert("Informações salvas com sucesso!");
+  } catch (error) {
+    console.error("Erro ao salvar informações:", error);
+    alert("Erro ao salvar informações.");
+  }
+};
+
 
 
   return (
@@ -357,6 +409,23 @@ const atualizarLocal = (index: number, campo: string, valor: string) => {
     </div>
   ))}
 </div>
+
+<div style={{ marginTop: "2rem" }}>
+  <button
+    onClick={handleSalvar}
+    style={{
+      padding: "10px 20px",
+      backgroundColor: "#4CAF50",
+      color: "#fff",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer"
+    }}
+  >
+    Salvar Informações e Sair
+  </button>
+</div>
+
 
     </div>
   );
