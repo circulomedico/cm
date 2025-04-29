@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { estadosBrasil, cidadesPorEstado } from "../../utils/cidadesBrasil";
+
 
 // Listagem de estados brasileiros
 const estadosBrasil = [
