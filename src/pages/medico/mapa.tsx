@@ -120,7 +120,111 @@ const atualizarLocal = (index: number, campo: string, valor: string) => {
       </div>
 
       <div style={{ marginTop: "2rem" }}>
-  <h3>Locais de Atendimento</h3>
+
+        <div style={{ marginTop: "2rem" }}>
+  <label>Profissão:</label><br />
+  <select
+    value={profissao}
+    onChange={(e) => {
+      setProfissao(e.target.value);
+      setEspecialidade(""); // limpa a especialidade se mudar a profissão
+    }}
+  >
+    <option value="">Selecione a profissão</option>
+    {listaProfissoes.map((profissaoItem, index) => (
+      <option key={index} value={profissaoItem}>
+        {profissaoItem}
+      </option>
+    ))}
+  </select>
+</div>
+
+{profissao && (
+  <div style={{ marginTop: "1rem" }}>
+    <label>Especialidade:</label><br />
+    <select
+      value={especialidade}
+      onChange={(e) => setEspecialidade(e.target.value)}
+    >
+      <option value="">Selecione a especialidade</option>
+      {listaEspecialidades.map((especialidadeItem, index) => (
+        <option key={index} value={especialidadeItem}>
+          {especialidadeItem}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
+<div style={{ marginTop: "2rem" }}>
+  <label>Nome do Conselho:</label><br />
+  <input
+    type="text"
+    value={nomeConselho}
+    onChange={(e) => setNomeConselho(e.target.value)}
+    placeholder="Ex: CRM, CRP, CREFITO..."
+  />
+</div>
+
+<div style={{ marginTop: "1rem" }}>
+  <label>Número do Conselho:</label><br />
+  <input
+    type="text"
+    value={numeroConselho}
+    onChange={(e) => setNumeroConselho(e.target.value)}
+  />
+</div>
+
+<div style={{ marginTop: "2rem" }}>
+  <label>Currículo Resumido (até 100 palavras):</label><br />
+  <textarea
+    value={curriculoResumido}
+    onChange={(e) => setCurriculoResumido(e.target.value)}
+    rows={4}
+    style={{ width: "100%" }}
+  />
+</div>
+
+<div style={{ marginTop: "1rem" }}>
+  <label>Currículo Completo (até 1000 palavras):</label><br />
+  <textarea
+    value={curriculoCompleto}
+    onChange={(e) => setCurriculoCompleto(e.target.value)}
+    rows={10}
+    style={{ width: "100%" }}
+  />
+</div>
+
+<div style={{ marginTop: "2rem" }}>
+  <label>Áreas de Destaque:</label><br />
+  <input
+    type="text"
+    value={inputArea}
+    onChange={(e) => setInputArea(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (inputArea.trim() && areasDestaque.length < 10) {
+          if (inputArea.length <= 20) {
+            setAreasDestaque([...areasDestaque, inputArea.trim()]);
+            setInputArea("");
+          } else {
+            alert("Cada área de destaque pode ter no máximo 20 letras.");
+          }
+        } else if (areasDestaque.length >= 10) {
+          alert("Você pode adicionar no máximo 10 áreas de destaque.");
+        }
+      }
+    }}
+    placeholder="Pressione Enter para adicionar"
+  />
+  <div style={{ marginTop: "0.5rem" }}>
+    <strong>Já incluídas:</strong> {areasDestaque.join(", ")}
+  </div>
+</div>
+
+        
+        <h3>Locais de Atendimento</h3>
   <button onClick={adicionarLocal} style={{ marginBottom: "1rem" }}>
     Adicionar Local
   </button>
