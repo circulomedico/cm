@@ -75,7 +75,6 @@ export default function MapaProfissional() {
     };
     carregarEspecialidades();
   }, [profissao]);
-
   const adicionarArea = (area: string) => {
     if (areasDestaque.length >= 10) {
       alert("Limite de 10 áreas de destaque atingido.");
@@ -120,7 +119,10 @@ export default function MapaProfissional() {
       alert("Máximo de 5 locais atingido");
       return;
     }
-    setLocaisAtendimento([...locaisAtendimento, { tipo: "", endereco: "", telefone: "" }]);
+    setLocaisAtendimento([
+      ...locaisAtendimento,
+      { tipo: "", pais: "", estado: "", cidade: "", rua: "", numero: "", complemento: "", cep: "", bairros: [], telefone: "", whatsapp: "", email: "", tipoAtendimento: "", planosSaude: [] }
+    ]);
   };
 
   const removerLocal = (index: number) => {
@@ -129,7 +131,7 @@ export default function MapaProfissional() {
     setLocaisAtendimento(novos);
   };
 
-  const atualizarLocal = (index: number, campo: string, valor: string) => {
+  const atualizarLocal = (index: number, campo: string, valor: any) => {
     const novos = [...locaisAtendimento];
     novos[index][campo] = valor;
     setLocaisAtendimento(novos);
@@ -234,13 +236,66 @@ export default function MapaProfissional() {
         <button onClick={adicionarLocal}>Adicionar Local</button>
         {locaisAtendimento.map((local, idx) => (
           <div key={idx} style={{ marginTop: "1rem", border: "1px solid #ccc", padding: "10px" }}>
-            <label>Tipo:</label><br />
-            <input value={local.tipo} onChange={(e) => atualizarLocal(idx, "tipo", e.target.value)} /><br />
-            <label>Endereço:</label><br />
-            <input value={local.endereco} onChange={(e) => atualizarLocal(idx, "endereco", e.target.value)} /><br />
-            <label>Telefone:</label><br />
-            <input value={local.telefone} onChange={(e) => atualizarLocal(idx, "telefone", e.target.value)} /><br />
-            <button onClick={() => removerLocal(idx)} style={{ marginTop: "10px" }}>Remover</button>
+            <label>Tipo de Local:</label><br />
+            <select value={local.tipo} onChange={(e) => atualizarLocal(idx, "tipo", e.target.value)}>
+              <option value="">Selecione</option>
+              <option value="Consultório">Consultório Particular</option>
+              <option value="Clínica">Clínica</option>
+              <option value="Hospital">Hospital</option>
+              <option value="Domiciliar">Atendimento Domiciliar</option>
+            </select>
+
+            {["Consultório", "Clínica", "Hospital"].includes(local.tipo) && (
+              <>
+                <div>
+                  <label>País:</label><br />
+                  <input value={local.pais} onChange={(e) => atualizarLocal(idx, "pais", e.target.value)} />
+                </div>
+                <div>
+                  <label>Estado:</label><br />
+                  <input value={local.estado} onChange={(e) => atualizarLocal(idx, "estado", e.target.value)} />
+                </div>
+                <div>
+                  <label>Cidade:</label><br />
+                  <input value={local.cidade} onChange={(e) => atualizarLocal(idx, "cidade", e.target.value)} />
+                </div>
+                <div>
+                  <label>Rua:</label><br />
+                  <input value={local.rua} onChange={(e) => atualizarLocal(idx, "rua", e.target.value)} />
+                </div>
+                <div>
+                  <label>Número:</label><br />
+                  <input value={local.numero} onChange={(e) => atualizarLocal(idx, "numero", e.target.value)} />
+                </div>
+                <div>
+                  <label>Complemento:</label><br />
+                  <input value={local.complemento} onChange={(e) => atualizarLocal(idx, "complemento", e.target.value)} />
+                </div>
+                <div>
+                  <label>CEP:</label><br />
+                  <input value={local.cep} onChange={(e) => atualizarLocal(idx, "cep", e.target.value)} />
+                </div>
+              </>
+            )}
+
+            {local.tipo === "Domiciliar" && (
+              <>
+                <div>
+                  <label>País:</label><br />
+                  <input value={local.pais} onChange={(e) => atualizarLocal(idx, "pais", e.target.value)} />
+                </div>
+                <div>
+                  <label>Estado:</label><br />
+                  <input value={local.estado} onChange={(e) => atualizarLocal(idx, "estado", e.target.value)} />
+                </div>
+                <div>
+                  <label>Cidade:</label><br />
+                  <input value={local.cidade} onChange={(e) => atualizarLocal(idx, "cidade", e.target.value)} />
+                </div>
+              </>
+            )}
+
+            <button onClick={() => removerLocal(idx)} style={{ marginTop: "10px", backgroundColor: "#f44336", color: "#fff" }}>Remover Local</button>
           </div>
         ))}
       </div>
